@@ -167,25 +167,75 @@
  * 
  */
 
+
 import mongoose from "mongoose";
 
-// establish connection
+// ===== establish connection =====
 
+const MONGODB_URI =
+  "mongodb+srv://ararbody17:ARARrara1712005@cluster0.nc9teyk.mongodb.net/";
 
-// define schema
+async function connect() {
+  await mongoose.connect(MONGODB_URI, { dbName: "test" });
+  console.log("Connected");
+}
 
+// ===== define schema =====
+const studentSchema = new mongoose.Schema({
+  name: String,
+  age: Number,
+  major: String,
+});
 
-// create document
+const Student = mongoose.model("Student", studentSchema);
 
+// ===== create document =====
+async function createStudents() {
+  await Student.insertMany([
+    { name: "Ali", age: 21, major: "CS" },
+    { name: "Sara", age: 23, major: "SE" },
+  ]);
+  console.log("✅ Inserted");
+}
 
-// read document
+// ===== read document =====
+async function readStudents() {
+  const all = await Student.find();
+  console.log(all);
+}
 
+// ===== update document =====
+async function updateStudent() {
+  await Student.updateOne({ name: "Ali" }, { age: 22 });
+  console.log("✅ Updated Ali");
+}
 
-// update document
+// ===== delete document =====
+async function deleteStudent() {
+  await Student.deleteOne({ name: "Sara" });
+  console.log("✅ Deleted Sara");
+}
 
+(async () => {
+  try {
+    await connect();
 
-// delete document
+    // 1) Create:
+    await createStudents();
 
+    // 2) Read:
+    await readStudents();
 
+    // 3) Update:
+    await updateStudent();
 
+    // 4) Delete:
+    await deleteStudent();
 
+    await readStudents();
+  } catch (err) {
+    console.error(err);
+  } finally {
+    await mongoose.disconnect();
+  }
+})();
